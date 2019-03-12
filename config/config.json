@@ -1,0 +1,32 @@
+{
+  "temp": {
+    "username": "root",
+    "password": "root@123",
+    "database": "hrm",
+    "host": "localhost",
+    "dialect": "mysql",
+    "port": 3308
+  },
+  "development": {
+    "username": "sql12282938",
+    "password": "2LUzSL9Qg9",
+    "database": "sql12282938",
+    "host": "sql12.freemysqlhosting.net",
+    "dialect": "mysql",
+    "port": 3306
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
