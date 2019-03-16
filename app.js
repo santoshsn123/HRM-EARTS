@@ -4,9 +4,11 @@ const cors = require("cors");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const models = require("./models");
+const router = require("./routers");
 let app = express();
 app.server = http.createServer(app);
 
+console.log("is this ?");
 // logger
 app.use(morgan("dev"));
 
@@ -23,18 +25,7 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
-  res.send("Welcome to the app New another");
-});
-app.get("/api", (req, res) => {
-  models.Admin.findAll()
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.send(err);
-    });
-});
+app.use("/", router);
 
 app.server.listen(process.env.PORT || 9999, () => {
   console.log(`Started on port ${app.server.address().port}`);
