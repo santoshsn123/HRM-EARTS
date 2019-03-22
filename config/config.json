@@ -31,10 +31,11 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "3BzhXBqany",
+    "password": "WK4A8dehHB",
+    "database": "3BzhXBqany",
+    "host": "remotemysql.com",
+    "dialect": "mysql",
+    "port": 3306
   }
 }
