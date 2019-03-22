@@ -7,11 +7,19 @@
     "dialect": "mysql",
     "port": 3308
   },
-  "development": {
+  "development1": {
     "username": "sql12282938",
     "password": "2LUzSL9Qg9",
     "database": "sql12282938",
     "host": "sql12.freemysqlhosting.net",
+    "dialect": "mysql",
+    "port": 3306
+  },
+  "development": {
+    "username": "3BzhXBqany",
+    "password": "WK4A8dehHB",
+    "database": "3BzhXBqany",
+    "host": "remotemysql.com",
     "dialect": "mysql",
     "port": 3306
   },
