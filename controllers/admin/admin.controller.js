@@ -92,7 +92,7 @@ exports.addEmpByAdmin = (req, res) => {
               mail
                 .welcomeMail({
                   userName: "Santosh narwade",
-                  link: baseUrl + "/empRegisterLink/" + data.linkCode,
+                  registerLink: baseUrl + "/empRegisterLink/" + data.linkCode,
                   loginLink: baseUrl,
                   to: data.email
                 })
