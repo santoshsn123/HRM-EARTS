@@ -3,6 +3,9 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 var privateCert = fs.readFileSync("cert/jwtRS256.key");
 const md5 = require("md5");
+const baseUrl = "http://entitledarts.com/hrm";
+const mail = require("../../config/mail");
+
 exports.loginApi = (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res.status(403).jsonp({ message: "Please Enter All Fields" });
@@ -15,7 +18,7 @@ exports.loginApi = (req, res) => {
       if (!emp.isActive) {
         return res.status(403).jsonp({
           message:
-            "You are not active Emp, ask Admin to Activate your Account!!!"
+            "Your account is Inactive, ask Admin to Activate your Account!!!"
         });
       } else {
         res.status(200).jsonp({
@@ -81,14 +84,25 @@ exports.addEmpByAdmin = (req, res) => {
               firstName: req.body.firstName,
               lastName: req.body.lastName,
               email: req.body.email,
+              salary: req.body.salary,
               linkCode: md5(randomNumber),
               isActive: false,
               isRegistered: false
             }).then(data => {
-              res.status(200).jsonp({
-                message: "Employee Added successfully!!",
-                data: data
-              });
+              mail
+                .welcomeMail({
+                  userName: "Santosh narwade",
+                  link: baseUrl + "/empRegisterLink/" + data.linkCode,
+                  loginLink: baseUrl,
+                  to: data.email
+                })
+                .then(mailres => {
+                  res.status(200).jsonp({
+                    message: "Employee Added successfully!!",
+                    data: data,
+                    mailresponse: mailres
+                  });
+                });
             });
           }
         }
@@ -125,6 +139,25 @@ exports.updateUser = (req, res) => {
     userDetails.password = md5(userDetails.password);
   }
 
+  models.Employees.update(userDetails, {
+    where: { id: id }
+  })
+    .then(data => {
+      if (!data) {
+        res.status(400).jsonp({ status: false, message: "Link is invalid" });
+      } else {
+        res.status(200).jsonp(data);
+      }
+    })
+    .catch(data => {
+      console.log("inside catch");
+    });
+};
+exports.updateUserbyAdmin = (req, res) => {
+  console.log("Request Here :--- ");
+  var id = req.params.id;
+  let userDetails = req.body;
+  console.log(userDetails);
   models.Employees.update(userDetails, {
     where: { id: id }
   })

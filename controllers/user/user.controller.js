@@ -6,6 +6,7 @@ const md5 = require("md5");
 const q = require("q");
 const Sequelize = require("sequelize");
 var Op = Sequelize.Op;
+const mail = require("../../config/mail");
 
 exports.getUser = (req, res) => {
   var id = req.params.id;
@@ -64,4 +65,16 @@ exports.getAllUser = (req, res) => {
   models.Employees.findAll({}).then(data => {
     res.send(data);
   });
+};
+
+exports.sampleMail = (req, res) => {
+  mail
+    .welcomeMail({
+      userName: "Santosh narwade",
+      link: "http://entitledarts.com/hrm/cashless-admin/",
+      to: "snarwade59@gmail.com"
+    })
+    .then(data => {
+      res.send({ response: data });
+    });
 };

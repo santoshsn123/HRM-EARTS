@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       linkCode: DataTypes.STRING,
       isActive: DataTypes.BOOLEAN,
       isRegistered: DataTypes.BOOLEAN,
-      password: DataTypes.STRING
+      password: DataTypes.STRING,
+      salary: DataTypes.INTEGER
     },
     {}
   );

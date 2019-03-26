@@ -41,6 +41,7 @@ module.exports = {
       password: {
         type: Sequelize.STRING
       },
+      salary: { type: DataTypes.INTEGER },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

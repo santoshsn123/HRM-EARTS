@@ -14,6 +14,11 @@ router
   .get("/userStatus/:id", adminCtrl.getRegStatus)
   .get("/users", authentication.loginRequired, adminCtrl.getUsers)
   .put("/users/:id", authentication.loginRequired, adminCtrl.updateUser)
+  .put(
+    "/usersByAdmin/:id",
+    authentication.loginRequired,
+    adminCtrl.updateUserbyAdmin
+  )
   .delete("/users/:id", authentication.loginRequired, adminCtrl.deleteUser)
   .put(
     "/userStatus/:id",
