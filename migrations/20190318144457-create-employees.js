@@ -42,6 +42,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       salary: { type: DataTypes.INTEGER },
+      forgetPassword: { type: DataTypes.STRING },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -14,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
       isActive: DataTypes.BOOLEAN,
       isRegistered: DataTypes.BOOLEAN,
       password: DataTypes.STRING,
-      salary: DataTypes.INTEGER
+      salary: DataTypes.INTEGER,
+      forgetPassword: DataTypes.STRING
     },
     {}
   );

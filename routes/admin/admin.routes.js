@@ -20,6 +20,9 @@ router
     adminCtrl.updateUserbyAdmin
   )
   .delete("/users/:id", authentication.loginRequired, adminCtrl.deleteUser)
+  .post("/forgetPassword", adminCtrl.forgetPassword)
+  .get("/forgetPassword/:link", adminCtrl.validateLink)
+  .put("/forgetPassword/:link", adminCtrl.forgetPassUpdate)
   .put(
     "/userStatus/:id",
     authentication.loginRequired,

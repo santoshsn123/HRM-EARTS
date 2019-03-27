@@ -200,3 +200,124 @@ exports.deleteUser = (req, res) => {
     res.status(200).jsonp(data);
   });
 };
+
+exports.forgetPassword = (req, res) => {
+  req.body.email;
+  const randomNumber = Math.floor(Math.random() * 1000000 + 1);
+  models.Employees.findOne({ where: { email: req.body.email } }).then(user => {
+    if (user) {
+      models.Employees.update(
+        { forgetPassword: md5(randomNumber) },
+        { where: { id: user.id } }
+      ).then(usernew => {
+        mail
+          .forgetPassword({
+            to: user.email,
+            resetLink: baseUrl + "/HRM/forgetPassword/" + md5(randomNumber),
+            userName: user.firstName,
+            loginLink: baseUrl + "/HRM"
+          })
+          .then(data => {
+            return res.status(200).jsonp({
+              message: "Email Sent containing information to reset password"
+            });
+          });
+      });
+    } else {
+      models.Admin.findOne({ where: { email: req.body.email } }).then(admin => {
+        if (admin) {
+          models.Admin.update(
+            { forgetPassword: md5(randomNumber) },
+            { where: { id: admin.id } }
+          ).then(adminnew => {
+            mail
+              .forgetPassword({
+                to: admin.email,
+                resetLink: baseUrl + "/HRM/forgetPassword/" + md5(randomNumber),
+                userName: admin.firstName,
+                loginLink: baseUrl + "/HRM"
+              })
+              .then(data => {
+                return res.status(200).jsonp({
+                  message: "Email Sent containing information to reset password"
+                });
+              });
+          });
+          // return res.status(200).jsonp({
+          //   message: "Email Sent containing information to reset password"
+          // });
+        } else {
+          return res.status(403).jsonp({
+            message: "Email Id is not registered with Us"
+          });
+        }
+      });
+    }
+  });
+};
+
+exports.validateLink = (req, res) => {
+  link = req.params.link;
+  // models.
+  models.Employees.findOne({ where: { forgetPassword: link } }).then(emp => {
+    if (emp) {
+      return res.status(200).jsonp({
+        message: "Valid Link",
+        status: true
+      });
+    } else {
+      models.Admin.findOne({ where: { forgetPassword: link } }).then(admin => {
+        if (admin) {
+          return res.status(200).jsonp({
+            message: "Valid Link",
+            status: true
+          });
+        } else {
+          return res.status(403).jsonp({
+            message: "InValid Link",
+            status: false
+          });
+        }
+      });
+    }
+  });
+};
+
+exports.forgetPassUpdate = (req, res) => {
+  link = req.params.link;
+  let password = req.body.password;
+  let cpassword = req.body.cpassword;
+  if (password != cpassword) {
+    return res.status(403).jsonp({ message: "Password Missmatch" });
+  }
+  models.Employees.findOne({ where: { forgetPassword: link } }).then(emp => {
+    if (emp) {
+      models.Employees.update(
+        { password: md5(password), forgetPassword: "" },
+        { where: { id: emp.id } }
+      );
+      return res.status(200).jsonp({
+        message: "Password Changed Successfully",
+        status: true
+      });
+    } else {
+      models.Admin.findOne({ where: { forgetPassword: link } }).then(admin => {
+        if (admin) {
+          models.Admin.update(
+            { password: md5(password), forgetPassword: "" },
+            { where: { id: admin.id } }
+          );
+          return res.status(200).jsonp({
+            message: "Password Changed Successfully",
+            status: true
+          });
+        } else {
+          return res.status(403).jsonp({
+            message: "InValid Link",
+            status: false
+          });
+        }
+      });
+    }
+  });
+};
