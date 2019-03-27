@@ -139,7 +139,21 @@ getCalculatedTimings = array => {
   let tempArr = [];
   let sum = 0;
   array.forEach(ar => {
-    tempArr.push(new Date(ar.endTime) - new Date(ar.startTime));
+    let endtime;
+    if (
+      !ar.completedStatus &&
+      getDateFormated(ar.startTime) !== getDateFormated("")
+    ) {
+      endtime = getDateFormated(ar.startTime) + " 20:00:00";
+    } else if (
+      !ar.completedStatus &&
+      getDateFormated(ar.startTime) === getDateFormated("")
+    ) {
+      endtime = new Date();
+    } else {
+      endtime = ar.endTime;
+    }
+    tempArr.push(new Date(endtime) - new Date(ar.startTime));
   });
   tempArr.forEach(data => {
     sum += data;
