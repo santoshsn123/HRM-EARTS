@@ -41,7 +41,7 @@ exports.deleteLeaves = (req, res) => {
 /** Leave Application Functionality Here After */
 exports.applyLeaves = (req, res) => {
   let applyLeave = req.body;
-  applyLeave.status = false;
+  applyLeave.status = 0;
   applyLeave.replyText = "";
   models.LeaveApplications.create(applyLeave).then(created => {
     res.send(created);

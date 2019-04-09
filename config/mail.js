@@ -2,14 +2,12 @@ var nodemailer = require("nodemailer");
 var handlebars = require("handlebars");
 var fs = require("fs");
 const q = require("q");
-
-var transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "santosh.narawade1@gmail.com",
-    pass: "slaxZenith@123"
-  }
-});
+const mailjet = require("node-mailjet").connect(
+  "a1ebc5d8ab971c1befab3dae5b85181e",
+  "436f125a36a9e5b9e9b0f331b2f9708f"
+);
+const fromEmail = "santosh.narawade1@gmail.com";
+const fromName = "Santosh Narwade";
 
 var readHTMLFile = function(path, callback) {
   fs.readFile(path, { encoding: "utf-8" }, function(err, html) {
@@ -24,27 +22,28 @@ var readHTMLFile = function(path, callback) {
 
 exports.welcomeMail = replacements => {
   let deffered = q.defer();
+
   readHTMLFile(__dirname + "/templates/welcome.html", function(err, html) {
     var template = handlebars.compile(html);
     var htmlToSend = template(replacements);
-
-    var mailOptions = {
-      from: "santosh.narawade1@gmail.com",
+    const mailArray = getMailArray({
       to: replacements.to,
+      userName: replacements.userName,
       subject: "Welcome to HRM::EntitleArts ",
-      html: htmlToSend
-    };
-
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (error) {
-        console.log(error);
-        deffered.reject(error);
-      } else {
-        console.log("Email sent: " + info.response);
-        deffered.resolve(info.response);
-        // res.status(200).jsonp({ message: info.response });
-      }
+      htmlToSend: htmlToSend
     });
+    const request = mailjet
+      .post("send", { version: "v3.1" })
+      .request({
+        Messages: mailArray
+      })
+      .then(result => {
+        console.log(result.body);
+        deffered.resolve(result.body);
+      })
+      .catch(err => {
+        deffered.reject(err.statusCode);
+      });
   });
   return deffered.promise;
 };
@@ -55,23 +54,44 @@ exports.forgetPassword = replacements => {
     var template = handlebars.compile(html);
     var htmlToSend = template(replacements);
 
-    var mailOptions = {
-      from: "santosh.narawade1@gmail.com",
+    const mailArray = getMailArray({
+      userName: replacements.userName,
       to: replacements.to,
       subject: "Forget Password Setting HRM::EntitleArts ",
-      html: htmlToSend
-    };
-
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (error) {
-        console.log(error);
-        deffered.reject(error);
-      } else {
-        console.log("Email sent: " + info.response);
-        deffered.resolve(info.response);
-        // res.status(200).jsonp({ message: info.response });
-      }
+      htmlToSend: htmlToSend
     });
+
+    request = mailjet
+      .post("send", { version: "v3.1" })
+      .request({
+        Messages: mailArray
+      })
+      .then(result => {
+        deffered.resolve(result.body);
+      })
+      .catch(err => {
+        deffered.reject(err.statusCode);
+      });
   });
   return deffered.promise;
+};
+
+getMailArray = plainObj => {
+  return [
+    {
+      From: {
+        Email: fromEmail,
+        Name: fromName
+      },
+      To: [
+        {
+          Email: plainObj.to,
+          Name: plainObj.userName
+        }
+      ],
+      Subject: plainObj.subject,
+      TextPart: plainObj.htmlToSend,
+      HTMLPart: plainObj.htmlToSend
+    }
+  ];
 };

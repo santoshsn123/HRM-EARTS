@@ -77,4 +77,39 @@ exports.sampleMail = (req, res) => {
     .then(data => {
       res.send({ response: data });
     });
+
+  // const mailjet = require("node-mailjet").connect(
+  //   "a1ebc5d8ab971c1befab3dae5b85181e",
+  //   "436f125a36a9e5b9e9b0f331b2f9708f"
+  // );
+  // const request = mailjet.post("send", { version: "v3.1" }).request({
+  //   Messages: [
+  //     {
+  //       From: {
+  //         Email: "santosh.narawade1@gmail.com",
+  //         Name: "Santosh Narwade"
+  //       },
+  //       To: [
+  //         {
+  //           Email: "snarwade59@gmail.com",
+  //           Name: "Santosh"
+  //         }
+  //       ],
+  //       Subject: "My Mail is here",
+  //       TextPart:
+  //         "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!",
+  //       HTMLPart:
+  //         "<h3>Dear passenger 1, welcome to <a href='https://www.mailjet.com/'>Mailjet</a>!</h3><br />May the delivery force be with you!"
+  //     }
+  //   ]
+  // });
+  // request
+  //   .then(result => {
+  //     console.log(result.body);
+  //     res.send(result.body);
+  //   })
+  //   .catch(err => {
+  //     console.log(err.statusCode);
+  //     res.send(err.statusCode);
+  //   });
 };
