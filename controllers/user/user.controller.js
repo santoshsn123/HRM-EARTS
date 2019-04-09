@@ -113,3 +113,47 @@ exports.sampleMail = (req, res) => {
   //     res.send(err.statusCode);
   //   });
 };
+
+exports.imageUpload = (req, res) => {
+  let id = req.params.userId;
+  // console.log("Image Uploading Here ", req);
+  // res.send("Uploading Here ...");
+  if (req.file) {
+    // console.log("Uploading file...");
+    var arr = req.file.originalname.split(".");
+    arr[arr.length - 1];
+    // var filename = req.file.filename + "." + arr[arr.length - 1];
+    // console.log("FileName : - ", filename);
+    var uploadStatus = "File Uploaded Successfully";
+    models.Employees.findOne({ where: { id: id } }).then(user => {
+      const newName = user.firstName + "_" + id + "." + arr[arr.length - 1];
+      fs.rename(req.file.path, "uploads/" + newName, error => {
+        models.Employees.update({ image: newName }, { where: { id: id } }).then(
+          updateDone => {
+            res.send({ uploadStatus: uploadStatus, filename: filename });
+          }
+        );
+      });
+    });
+  } else {
+    console.log("No File Uploaded");
+    var filename = "FILE NOT UPLOADED";
+    var uploadStatus = "File Upload Failed";
+  }
+};
+
+exports.showImage = (req, res) => {
+  let image = req.params.image;
+
+  fs.readFile("uploads/" + image, function(err, content) {
+    if (err) {
+      res.writeHead(400, { "Content-type": "text/html" });
+      console.log(err);
+      res.end("No such image");
+    } else {
+      //specify the content type in the response will be an image
+      res.writeHead(200, { "Content-type": "image/jpg" });
+      res.end(content);
+    }
+  });
+};

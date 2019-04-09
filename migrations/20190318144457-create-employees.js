@@ -45,6 +45,7 @@ module.exports = {
       forgetPassword: { type: DataTypes.STRING },
       age: { type: DataTypes.STRING },
       role: { type: DataTypes.STRING },
+      image: { type: DataTypes.STRING },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
