@@ -43,6 +43,8 @@ module.exports = {
       },
       salary: { type: DataTypes.INTEGER },
       forgetPassword: { type: DataTypes.STRING },
+      age: { type: DataTypes.STRING },
+      role: { type: DataTypes.STRING },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

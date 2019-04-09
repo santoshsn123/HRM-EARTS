@@ -13,7 +13,7 @@ router
   )
   .get("/userStatus/:id", adminCtrl.getRegStatus)
   .get("/users", authentication.loginRequired, adminCtrl.getUsers)
-  .put("/users/:id", authentication.loginRequired, adminCtrl.updateUser)
+  .put("/users/:id", adminCtrl.updateUser) //authentication.loginRequired,
   .put(
     "/usersByAdmin/:id",
     authentication.loginRequired,
