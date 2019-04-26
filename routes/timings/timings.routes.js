@@ -10,6 +10,7 @@ router
   .get("/getWorkingDays/:date", timings.getWorkingDays)
   .get("/getLeavesInMonth/:id/:date", timings.getLeavesInMonth)
   .get("/getSalaryMonth/:id/:date", timings.getSalaryMonth)
+  .get("/getPunchinStatusForDay/:id/:date", timings.getPunchinStatusForDay)
   .get("/getPunchStat/:id", timings.getStatus)
   .put("/punchOut/:id", timings.punchOut);
 

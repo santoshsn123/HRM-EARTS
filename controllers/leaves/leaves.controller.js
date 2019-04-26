@@ -14,7 +14,11 @@ exports.getAllLeaves = (req, res) => {
 };
 
 exports.createLeave = (req, res) => {
+  console.log("Notify Here :- ", req.body.notify);
   models.AllLeaves.create(req.body).then(data => {
+    if (req.body.notify) {
+      notifyEmployessAboutLeave(req.body);
+    }
     res.send(data);
   });
 };
@@ -75,4 +79,10 @@ exports.changeStatusByAdmin = (req, res) => {
       res.send(data);
     }
   );
+};
+
+notifyEmployessAboutLeave = () => {
+  models.Employees.findAll().then(Employees => {
+    Employees.map(emp => {});
+  });
 };

@@ -7,12 +7,14 @@ const baseUrl = "http://entitledarts.com/hrm";
 const mail = require("../../config/mail");
 
 exports.loginApi = (req, res) => {
-  if (!req.body.email || !req.body.password) {
+  const email = req.body.email.toLowerCase();
+  console.log(req.body.password);
+  if (!email || !req.body.password) {
     return res.status(403).jsonp({ message: "Please Enter All Fields" });
   }
   // /Check Employee Login/
   models.Employees.findOne({
-    where: { email: req.body.email, password: md5(req.body.password) }
+    where: { email: email, password: md5(req.body.password) }
   }).then(emp => {
     if (emp) {
       if (!emp.isActive) {
@@ -35,7 +37,7 @@ exports.loginApi = (req, res) => {
       // Check Admin Login
       models.Admin.findOne({
         where: {
-          email: req.body.email,
+          email: email,
           password: md5(req.body.password)
         }
       }).then(data => {

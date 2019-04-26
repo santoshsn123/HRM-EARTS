@@ -13,11 +13,6 @@ exports.punchIn = (req, res) => {
     order: [["id", "desc"]]
   }).then(data => {
     if (data) {
-      console.log(
-        "Created Date : - ",
-        getProperDate(data.createdAt),
-        getProperDate()
-      );
       if (getProperDate(data.createdAt) == getProperDate()) {
         createSubTimings(id, data.id).then(created => {
           return res.send(created);
@@ -84,30 +79,129 @@ exports.getSalaryMonth = (req, res) => {
   let id = req.params.id;
   // let dt = new Date(date);
   // var lastDate = new Date(dt.getFullYear(), dt.getMonth() + 1, 0);
-  calculateLeavseInMonth(date, id).then(leavesInMonth => {
-    leavesInMonth;
+
+  // calculateLeavseInMonth(date, id).then(leavesInMonth => {
+  //   leavesInMonth;
+  //   models.Employees.findOne({ where: { id: id } }).then(user => {
+  //     var totalMonthDays = leavesInMonth.totalMonthDays.getDate();
+  //     let perdaySalary = user.salary / totalMonthDays;
+  //     let presentCount = leavesInMonth.presentCount;
+  //     let MonthlySalary =
+  //       presentCount == leavesInMonth.workingdays
+  //         ? presentCount * perdaySalary
+  //         : (presentCount + 1) * perdaySalary;
+  //     let profTax = leavesInMonth.totalMonthDays.getMonth() == 3 ? 300 : 200;
+  //     const finalSal = presentCount == 0 ? 0 : MonthlySalary - profTax;
+  //     res.send({ monthSalary: finalSal });
+  //   });
+  // });
+  findMonthlystatforUser(date, id).then(data => {
+    let timings = 0;
+    data.map(dt => {
+      timings += dt.dataValues.totalTimingUnconverted;
+    });
     models.Employees.findOne({ where: { id: id } }).then(user => {
-      var totalMonthDays = leavesInMonth.totalMonthDays.getDate();
-      let perdaySalary = user.salary / totalMonthDays;
-      let presentCount = leavesInMonth.presentCount;
-      let MonthlySalary =
-        presentCount == leavesInMonth.workingdays
-          ? presentCount * perdaySalary
-          : (presentCount + 1) * perdaySalary;
-      let profTax = leavesInMonth.totalMonthDays.getMonth() == 3 ? 300 : 200;
-      const finalSal = presentCount == 0 ? 0 : MonthlySalary - profTax;
-      res.send({ monthSalary: finalSal });
+      let dt = new Date(date);
+      var lastDate = new Date(dt.getFullYear(), dt.getMonth() + 1, 0);
+
+      var minutes = (timings / (1000 * 60)).toFixed(1);
+
+      res.send({
+        monthSalary: (
+          (user.salary / lastDate.getDate() / 8 / 60) *
+          parseInt(minutes)
+        ).toFixed(0)
+      });
     });
   });
 };
 exports.getLeavesInMonth = (req, res) => {
   let date = req.params.date;
   let id = req.params.id;
-  calculateLeavseInMonth(date, id).then(leavesInMonth => {
-    res.send({
-      leavesInMonth: leavesInMonth.workingdays - leavesInMonth.presentCount
+
+  // calculateLeavseInMonth(date, id).then(leavesInMonth => {
+  //   console.log(leavesInMonth);
+  //   const leavesInMonthCalculate =
+  //     leavesInMonth.workingdays - leavesInMonth.presentCount;
+  //   reduceremainingdaysofCurrentMonth(leavesInMonthCalculate, date, id).then(
+  //     leaves => {
+  //       res.send({
+  //         leavesInMonth: leaves
+  //       });
+  //     }
+  //   );
+  // });
+
+  findMonthlystatforUser(date, id).then(data => {
+    let timings = 0;
+    data.map(dt => {
+      timings += dt.dataValues.totalTimingUnconverted;
     });
+    res.send({ leavesInMonth: timeConversion(timings) });
   });
+
+  // let dt = new Date(date);
+  // console.log("Want to know month :- ", dt.getMonth());
+  // var firstDate = new Date(dt.getFullYear(), dt.getMonth(), 1);
+  // var lastDate = new Date(dt.getFullYear(), dt.getMonth() + 1, 0);
+  // models.MainTimings.findAll({
+  //   where: {
+  //     createdAt: {
+  //       [Op.between]: [
+  //         getDateFormated(firstDate) + " 00:00:00",
+  //         getDateFormated(lastDate) + " 23:59:59"
+  //       ]
+  //     },
+  //     userId: id
+  //   }
+  // }).then(data => {
+  //   let workingArray;
+  //   workingArray = data.map(working => {
+  //     return getDateFormated(working.createdAt);
+  //   });
+  //   res.send(workingArray);
+  // });
+};
+
+reduceremainingdaysofCurrentMonth = (leaves, date, id) => {
+  var deffered = q.defer();
+  let demandedDate = new Date(date);
+  let currentDate = new Date();
+  if (
+    demandedDate.getMonth() == currentDate.getMonth() &&
+    demandedDate.getFullYear() == currentDate.getFullYear()
+  ) {
+    console.log("if@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+    let lastDate = new Date(
+      demandedDate.getFullYear(),
+      demandedDate.getMonth() + 1,
+      0
+    );
+    leaves = leaves - (lastDate.getDate() - currentDate.getDate());
+  } else {
+    console.log("else@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+    leaves;
+  }
+
+  models.Employees.findOne({ where: { id: id } }).then(emp => {
+    let startDate = emp.createdAt;
+    if (
+      demandedDate.getMonth() == startDate.getMonth() &&
+      demandedDate.getFullYear() == startDate.getFullYear()
+    ) {
+      let sund = sundays(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate()
+      );
+      leaves = leaves - startDate.getDate() + sund + 1;
+    } else {
+      leaves;
+    }
+    console.log("Here is leaves : ", leaves);
+    deffered.resolve(leaves);
+  });
+  return deffered.promise;
 };
 
 calculateLeavseInMonth = (date, id) => {
@@ -152,6 +246,7 @@ exports.getWorkingDays = (req, res) => {
   let date = req.params.date;
   let dt = new Date(date);
   countWorkingDays(dt).then(workingdays => {
+    console.log("working Days : - ", workingdays);
     res.send({
       workingDays: workingdays
     });
@@ -160,7 +255,7 @@ exports.getWorkingDays = (req, res) => {
 
 countWorkingDays = dt => {
   let deffered = q.defer();
-  let noOfSundays = sundays(dt.getFullYear(), dt.getMonth());
+  let noOfSundays = sundays(dt.getFullYear(), dt.getMonth(), false);
   var firstDate = new Date(dt.getFullYear(), dt.getMonth(), 1);
   var lastDate = new Date(dt.getFullYear(), dt.getMonth() + 1, 0);
   models.AllLeaves.findAll({
@@ -173,15 +268,27 @@ countWorkingDays = dt => {
       }
     }
   }).then(timing => {
-    deffered.resolve(lastDate.getDate() - (noOfSundays + timing.length));
-    // res.send({
-    //   workingDays: lastDate.getDate() - (noOfSundays + timing.length)
-    // });
+    let predefinedleavesExecptSundays = 0;
+    for (let i = 0; i < timing.length; i++) {
+      console.log("Here :-", timing[i].leaveDate, timing[i].reason);
+      const date = new Date(timing[i].leaveDate);
+      date.getDay() !== 0 ? predefinedleavesExecptSundays++ : "";
+      console.log(predefinedleavesExecptSundays);
+    }
+    deffered.resolve(
+      lastDate.getDate() - (noOfSundays + predefinedleavesExecptSundays)
+    );
+    console.log(
+      lastDate.getDate(),
+      noOfSundays,
+      predefinedleavesExecptSundays,
+      lastDate.getDate() - (noOfSundays + predefinedleavesExecptSundays)
+    );
   });
   return deffered.promise;
 };
 
-sundays = (year, month) => {
+sundays = (year, month, tillDate) => {
   var day, counter, date;
   day = 1;
   counter = 0;
@@ -189,7 +296,19 @@ sundays = (year, month) => {
   while (date.getMonth() === month) {
     if (date.getDay() === 0) {
       // Sun=0, Mon=1, Tue=2, etc.
-      counter += 1;
+      if (tillDate) {
+        if (date.getDate() < tillDate) {
+          counter += 1;
+        }
+      } else {
+        counter += 1;
+      }
+      // if (tillDate && date.getDay() < tillDate) {
+      //   counter += 1;
+      // } else if (tillDate && date.getDay() > tillDate) {
+      // } else {
+      //   counter += 1;
+      // }
     }
     day += 1;
     date = new Date(year, month, day);
@@ -197,10 +316,53 @@ sundays = (year, month) => {
   return counter;
 };
 
-exports.getMonthlyStat = (req, res) => {
+exports.getPunchinStatusForDay = (req, res) => {
   const id = req.params.id;
   let date = req.params.date;
 
+  date = new Date(date);
+
+  models.MainTimings.findAll({
+    where: {
+      userId: id,
+      startTime: {
+        [Op.between]: [
+          getDateFormated(date) + " 00:00:00",
+          getDateFormated(date) + " 23:59:59"
+        ]
+      }
+    },
+    include: [
+      {
+        model: models.SubTimings
+      }
+    ]
+  }).then(data => {
+    data.map(dt => {
+      dt.dataValues.formatedStartTime = getTimeFormated(dt.startTime);
+      dt.dataValues.formatedEndTime = getTimeFormated(dt.endTime);
+      dt.dataValues.SubTimings.map(subtim => {
+        subtim.dataValues.startFormatedTime = getTimeFormated(subtim.startTime);
+        subtim.dataValues.endFormatedTime = getTimeFormated(subtim.endTime);
+      });
+      dt.dataValues.totalTiming = timeConversion(
+        getCalculatedTimings(dt.SubTimings)
+      );
+    });
+    console.log(data);
+    res.send(data);
+  });
+};
+exports.getMonthlyStat = (req, res) => {
+  const id = req.params.id;
+  let date = req.params.date;
+  findMonthlystatforUser(date, id).then(data => {
+    res.send(data);
+  });
+};
+
+findMonthlystatforUser = (date, id) => {
+  let deffered = q.defer();
   date = new Date(date);
   var firstDate = new Date(date.getFullYear(), date.getMonth(), 1);
   var lastDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
@@ -231,12 +393,15 @@ exports.getMonthlyStat = (req, res) => {
       dt.dataValues.totalTiming = timeConversion(
         getCalculatedTimings(dt.SubTimings)
       );
+      dt.dataValues.totalTimingUnconverted = getCalculatedTimings(
+        dt.SubTimings
+      );
     });
-
-    res.send(data);
+    deffered.resolve(data);
+    // res.send(data);
   });
+  return deffered.promise;
 };
-
 getDateFormated = date => {
   if (date) {
     var newdate = new Date(date);
@@ -297,11 +462,12 @@ var timeConversion = millisec => {
     return seconds + " Sec";
   } else if (minutes < 60) {
     return minutes + " Min";
-  } else if (hours < 24) {
-    return hours + " Hrs";
   } else {
-    return days + " Days";
+    return hours + " Hrs";
   }
+  // else {
+  //   return days + " Days";
+  // }
 };
 exports.punchOut = (req, res) => {
   const id = req.params.id;
