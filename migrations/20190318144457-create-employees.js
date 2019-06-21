@@ -41,11 +41,11 @@ module.exports = {
       password: {
         type: Sequelize.STRING
       },
-      salary: { type: DataTypes.INTEGER },
-      forgetPassword: { type: DataTypes.STRING },
-      age: { type: DataTypes.STRING },
-      role: { type: DataTypes.STRING },
-      image: { type: DataTypes.STRING },
+      salary: { type: Sequelize.INTEGER },
+      forgetPassword: { type: Sequelize.STRING },
+      age: { type: Sequelize.STRING },
+      role: { type: Sequelize.STRING },
+      image: { type: Sequelize.STRING },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

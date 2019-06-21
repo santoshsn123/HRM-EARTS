@@ -27,7 +27,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       forgetPassword: {
-        type: DataTypes.STRING
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
