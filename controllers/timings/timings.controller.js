@@ -44,6 +44,7 @@ exports.punchIn = (req, res) => {
 
 exports.getStatus = (req, res) => {
   var id = req.params.id;
+  console.log("MainTiming Query");
   models.MainTimings.findOne({
     where: {
       userId: id,
@@ -51,6 +52,7 @@ exports.getStatus = (req, res) => {
     },
     order: [["id", "desc"]]
   }).then(data => {
+    console.log("%%%%%%%%%%%%%%%%%%%%%Checking Data here :- ");
     if (!data) {
       punchinAvailableStat(res);
     } else {
@@ -60,12 +62,14 @@ exports.getStatus = (req, res) => {
           order: [["id", "desc"]]
         }).then(subData => {
           if (subData) {
+            console.log("in if condition ");
             if (subData.completedStatus) {
               punchinAvailableStat(res);
             } else {
               punchInNotAvailable(res);
             }
           } else {
+            console.log("in else condition ");
             punchinAvailableStat(res);
           }
         });
@@ -402,11 +406,14 @@ findMonthlystatforUser = (date, id) => {
   });
   return deffered.promise;
 };
-getDateFormated = date => {
+var getDateFormated = date => {
   if (date) {
+    
     var newdate = new Date(date);
+    console.log(date,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@Inside If condition@@@@@@@@@@@@@@@@@@@@@",newdate);
   } else {
     var newdate = new Date();
+    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Inside else condition@@@@@@@@@@@@@@@@@@@@@",newdate);
   }
 
   var mm = newdate.getMonth() + 1;
@@ -415,10 +422,13 @@ getDateFormated = date => {
   if (mm < 10) {
     month = "0" + mm;
   }
-  // console.log(yyyy + "-" + month + "-" + newdate.getDate());
+  else{
+    month = mm;
+  }
+  console.log(yyyy + "-" + month + "-" + newdate.getDate());
   return yyyy + "-" + month + "-" + newdate.getDate();
 };
-getCalculatedTimings = array => {
+var getCalculatedTimings = array => {
   let tempArr = [];
   let sum = 0;
   array.forEach(ar => {
@@ -443,7 +453,7 @@ getCalculatedTimings = array => {
   });
   return sum;
 };
-getTimeFormated = time => {
+var getTimeFormated = time => {
   let tm = new Date(time);
   let minutes = tm.getMinutes() < 10 ? "0" + tm.getMinutes() : tm.getMinutes();
   let seconds = tm.getSeconds() < 10 ? "0" + tm.getSeconds() : tm.getSeconds();
